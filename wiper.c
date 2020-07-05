@@ -1,32 +1,35 @@
 #include <stdio.h>
+#include <sys/types.h>
+#include <sys/stat.h>
 
 int main(int argc, char *argv[])
 {
 
+	// Check if input file is given before starting, exit if no input
 	if (argc == 1 ){
-		printf("You have not entered any arguments. Exiting\n");
+		fprintf(stderr,"You have not entered any arguments. Exiting\n");
 		return -1;
 	}
 
+	// Iterate over all input files
 	for (int i = 1; i < argc; i++){
 
+		struct stat file_info;
+		off_t fsize = 0;
+
+		if ( stat( argv[i], &file_info) == 0){
+			fsize = file_info.st_size;
+		} 
+		else {
+			printf("\"%s\" could not be opened. Skipping\n",argv[i]);
+		}
+	
 		FILE* fptr = fopen(argv[i],"r+");
 
-		if (fptr == NULL){
-			printf("\"%s\" could not be opened. Skipping\n",argv[i]);
-			continue;
-		}
-
-		int fsize = 0;
-		
-		fseek(fptr,0, SEEK_END);
-		fsize = ftell(fptr);
-		fseek(fptr,0, SEEK_SET);
-
-		printf("Size of \"%s\" is %d bytes\n", argv[i], fsize);
+		printf("Size of \"%s\" is %ld bytes\n", argv[i], fsize);
 		
 		for (int i = 0; i < fsize; i++){
-			fputc('0',fptr);
+			fputc(0,fptr);
 		}
 
 		fclose(fptr);
