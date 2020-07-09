@@ -2,6 +2,8 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 
+#define MAX_INT32 (2147483647)
+
 int main(int argc, char *argv[])
 {
 
@@ -24,11 +26,11 @@ int main(int argc, char *argv[])
 			printf("\"%s\" could not be opened. Skipping\n",argv[i]);
 		}
 	
-		FILE* fptr = fopen(argv[i],"r+");
+		FILE* fptr = fopen(argv[i],"w");
 
 		printf("Size of \"%s\" is %ld bytes\n", argv[i], fsize);
-		
-		for (int i = 0; i < fsize; i++){
+
+	for (int i = 0; i < fsize; i++){
 			fputc(0,fptr);
 		}
 
