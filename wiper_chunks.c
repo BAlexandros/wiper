@@ -2,8 +2,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 
-#define MAX_INT32 (2147483647)
-#define CHUNK_SIZE (4)
+#define CHUNK_SIZE (4096)
 
 int main(int argc, char *argv[])
 {
@@ -18,10 +17,10 @@ int main(int argc, char *argv[])
 	for (int i = 1; i < argc; i++){
 
 		struct stat file_info;
-		off_t fsize = 0;
 		char buffer[CHUNK_SIZE] = {0};
-		size_t chunk_number = 0;
-		size_t chunk_remainder = 0;
+		unsigned long long int fsize = 0;
+		unsigned long long int chunk_number = 0;
+		unsigned long long int chunk_remainder = 0;
 
 		if ( stat( argv[i], &file_info) == 0){
 			fsize = file_info.st_size;
@@ -34,15 +33,19 @@ int main(int argc, char *argv[])
 	
 		FILE* fptr = fopen(argv[i],"w");
 
-		printf("Size of \"%s\" is %ld bytes\n", argv[i], fsize);
-		printf("%ld chunks of %d bytes, and %ld remaining \n",chunk_number,CHUNK_SIZE,chunk_remainder);
+		printf("Size of \"%s\" is %lld bytes\n", argv[i], fsize);
+		printf("%lld chunks of %d bytes, and %lld remaining \n",chunk_number,CHUNK_SIZE,chunk_remainder);
 
+		// Clear all chuncks
 		for (size_t i = 0; i < chunk_number; i++){
 			fwrite(buffer,sizeof(char),CHUNK_SIZE,fptr);
 		}
+		// and then take care of the leftover bytes
 		for (size_t i = 0; i < chunk_remainder; i++){
 			putc(0,fptr);
 		}
+
+		printf("\"%s\" wiped\n",argv[i]);
 
 		fclose(fptr);
 
